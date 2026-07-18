@@ -12,7 +12,7 @@ import { protect } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.post("/students ", userRegister);
+router.post("/students", userRegister);
 router.post("/login", userLogin);
 router.get("/profile", protect, userProfile);
 router.get("/students", protect, allUsers);
