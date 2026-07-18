@@ -51,40 +51,53 @@ export const userProfile = async (req, res, next) => {
   }
 };
 
-export const allUsers = async (req, res,next) => {
+export const allUsers = async (req, res, next) => {
   try {
     const profiles = await getAll(req);
-        return res.status(200).json({
-          success: true,
-          message: "User profile retrieved successfully",
-          data: profiles,
-        });
+    return res.status(200).json({
+      success: true,
+      message: "User profile retrieved successfully",
+      data: profiles,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const userGetById = async (req, res) => {
+export const userGetById = async (req, res, next) => {
   try {
     const result = await getById(req, res);
-    res.status(200).json({ success: true, data: result });
+    return res.status(200).json({
+      success: true,
+      message: "User profile retrieved successfully",
+      data: result,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
-export const updatedUserInfo = async (req, res) => {
+export const updatedUserInfo = async (req, res, next) => {
   try {
     const result = await updateUser(req, res);
-    res.status(200).json({ success: true, data: result });
+    return res.status(200).json({
+      success: true,
+      message: "User profile updated successfully",
+      data: result,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
-export const userDelete = async (req, res) => {
+export const userDelete = async (req, res, next) => {
   try {
-    const result = await deleteUser(req, res);
-    res.status(200).json({ success: true, data: result });
+    const userID = req.params.id;
+    const result = await deleteUser(userID);
+    return res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+      data: result,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return next(error);
   }
 };

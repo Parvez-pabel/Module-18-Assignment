@@ -35,7 +35,6 @@ export const login = async (Email, Password) => {
 
 export const profileDetails = async (userID) => {
   try {
-    
     const userDetails = await userModel.findById(userID).select("-Password");
     if (!userDetails) {
       const error = new Error("User data not found");
@@ -66,11 +65,12 @@ export const getById = async (req, res) => {
     const userID = req.params.id;
     const user = await userModel.findById(userID).select("-Password");
     if (!user) {
-      return { status: "fail", data: "Resource Not Found" };
+      const error = new Error("User data not found");
+      error.statusCode = 404;
+      throw error;
     }
-    return { status: "success", data: user };
+    return user;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
@@ -78,28 +78,35 @@ export const getById = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const userID = req.params.id;
+    const reqBody = req.body;
     const updatedUser = await userModel
-      .findByIdAndUpdate(userID, { Name: req.body.Name }, { new: true })
+      .findByIdAndUpdate(userID, reqBody, { new: true })
       .select("-Password");
-    return { status: "success", data: updatedUser };
+    if (!updatedUser) {
+      const error = new Error("User data not found");
+      error.statusCode = 404;
+      throw error;
+    }
+    return updatedUser;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
-export const deleteUser = async (req) => {
+export const deleteUser = async (userID) => {
   try {
-    const userID = req.params.id;
     if (!userID) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Resource Not Found",
-      });
+      const error = new Error("User ID is required");
+      error.statusCode = 404;
+      throw error;
     }
-    await userModel.findByIdAndDelete(userID);
-    return { status: "success" };
+    const deletedDetails = await userModel.findByIdAndDelete(userID);
+    if (!deletedDetails) {
+      const error = new Error("User not found or already deleted");
+      error.statusCode = 404; // Not Found
+      throw error;
+    }
+    return deletedDetails;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
